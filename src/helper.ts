@@ -73,7 +73,7 @@ const parseBody = async (req: IncomingMessage): Promise<IUserShort | null> => {
 }
 
 const isValidUserData = (user: IUserShort): boolean => {
-    return Boolean(user && (user.username || user.age || user.hobbies));
+    return Boolean(user && (user.username && user.age && user.hobbies));
 } 
 
 export { 
