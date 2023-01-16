@@ -6,10 +6,12 @@ import {
     sendServerResponse 
 } from "./helper";
 import { serverRouter } from './router';
+import { env } from 'node:process';
+import cluster from 'node:cluster';
+import { USERS_TABLE } from './db';
 
 const server = createServer(async (req, res) => {
     try{
-        // console.log(req.url);
 		if (!req.url) {
 			sendServerResponse(res, SERVER_RESPONSE_CODES.BAD_RESPONSE_NOT_FOUND, SERVER_RESPONSE_MESSAGES.PAGE_NOT_FOUND);
 			return;
@@ -26,7 +28,12 @@ const server = createServer(async (req, res) => {
 		}
 
 		await serverRouter(req, res);
-    } catch (err) {
+
+		if (env.MODE === 'multi') {
+			cluster.worker?.send({ users: USERS_TABLE });
+		}
+
+	} catch (err) {
         sendServerResponse(res, SERVER_RESPONSE_CODES.BAD_RESPONSE_SERVER_ERROR, SERVER_RESPONSE_MESSAGES.SERVER_ERROR);
     }
 });
